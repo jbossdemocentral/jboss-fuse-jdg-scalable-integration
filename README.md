@@ -65,4 +65,4 @@ To run the demo
 
 
 
-[network-diagram]: images/network-diagram.svg "Network diagram of stock ticker demo"
+[network-diagram]: https://github.com/rhnordics/jboss-fuse-jdg-scalable-integration/blob/master/images/network-diagram.svg "Network diagram of stock ticker demo"
