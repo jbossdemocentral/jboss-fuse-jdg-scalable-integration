@@ -29,7 +29,7 @@ JBoss Data Grid recently (since 6.4) introduced a camel component capable of sto
 
 The broker decides to implement a solution based on JBoss Fuse and JBoss Data Grid running in remote mode.
 
-![Network diagram](https://github.com/rhnordics/jboss-fuse-jdg-scalable-integration/blob/master/images/network-diagram.svg "Network diagram of stock ticker demo")
+![Network diagram](images/network-diagram.svg)
 
 To run the demo
 -----------------
