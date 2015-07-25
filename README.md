@@ -8,7 +8,7 @@ Setup
 ---------------
 To setup the infrastructure for the demo download the follwoing files to the `installs` directory:
 
-* jboss-fuse-full-6.1.1.redhat-412.zip
+* jboss-fuse-full-6.2.0.redhat-133.zip
 
 After that run the `init.sh` script
 
@@ -16,20 +16,21 @@ After that run the `init.sh` script
 
 Demo storty
 -----------
-
-A stock market broker needs to provide it's brokers with immediate data about value of stocks. The stock-market offers A-MQ as an interface for listening to stock tick (events with current value of a stock based on the last trades). The broker decides to use JBoss Fuse to consume the stock tick events and implements a integration flow to receive and transform the events from JSON to Java POJO. The brokers however wants to correlate the latest event with the previous 100 to be able to spot trends.
+A stock market broker needs to provide it's brokers with historical data of past stock volume (amount of shares that trade hands from sellers to buyers). And also needs to list all today's buyer's shares in the console after displaying the past volume. The broker decides to send order information to trigger stock tick event, the information are send to JBoss Fuse. It implements a integration flow to request for historical data from external SAAS, then pass the data to stock ticker console, and then process the order by parsing the XML to Java POJO for display and further process. 
 
 The problem
 -----------
-The volume of stock tick events is very high and to be able to consume the events without overflowing the integration the sizing team has calculated that the integration flow needs to be able to process an event in under 10 ms. To be able to meet the requirement of storing the last 100 events they it department has identified that their standard database storage, that has an SLA of 500 ms for a write operation, is will not be able to meet this requirement.
+The volume of historical stock tick data is very high and to be able to consume the events without overflowing the integration the sizing team has calculated that the integration flow needs to be able to process an event in under 10 ms. To be able to meet the requirement of storing the last 100 events they it department has identified that their standard database storage, that has an SLA of 500 ms for a write operation, is will not be able to meet this requirement. Also the inital data that triggers the event contains customer information, this information should not be passed to external services. 
 
 The solution
 ------------
-JBoss Data Grid recently (since 6.4) introduced a camel component capable of storing high volume of data in-memory. It also provides eviction strategy where the data grid automatically can evict events based on different algorithms like FIFO, LIRS etc. JBoss Data Grid also supports different architectures and can either run embedded or remote, where embedded gives he best performance but are then sharing resources (memory, cpu etc) with the JBoss Fuse, while remote adds a network call but gives added scalability options for the data layer.
+JBoss Data Grid recently (since 6.4) introduced a camel component capable of storing high volume of data in-memory. It also provides eviction strategy where the data grid automatically can evict events based on different algorithms like FIFO, LIRS etc. JBoss Data Grid also supports different architectures and can either run embedded or remote, where embedded gives he best performance but are then sharing resources (memory, cpu etc) with the JBoss Fuse, while remote adds a network call but gives added scalability options for the data layer. And it's memory fast caching nature make it the prefect medium for storing temporary data as needed in the claim check EIP.  
 
 The broker decides to implement a solution based on JBoss Fuse and JBoss Data Grid running in remote mode.
 
 ![Network diagram](images/network-diagram.svg)
+
+![Stock Ticker console](images/stockticker.png)
 
 To run the demo
 -----------------
@@ -48,15 +49,33 @@ To run the demo
 
 	   sh init.sh
 
-1. Start a stock plotter client
+1. Login to Fuse management console
+
+	   http://localhost:8181    (u:admin/p:admin)
+![Network diagram](images/01_containers.png)
+
+2. Go to Services Tab, under container, find containt `tickercon`, add profile `demo-jdg-stockticker` to tickercon container
+
+![Deploy profile](images/02_deploy2container.png)
+3. Start a stock plotter client
 
 	   sh support/start-client.sh
 
-1. Watch as stock ticks are plotted in the client.
+1. Start stock ticker by providing quote and order, place the `/support/stockorderRHT1001.xml file` to
 
-1. Open the Fuse console and verify that the processing of event is under 10 ms.
+	   ./target/jboss-fuse-6.2.0.redhat-133/instances/tickercon/stockfolder
 
-1. Pause the stock-producer to verify that the plotter stops.
+3. Watch as stock ticks are plotted in the client.
+
+1. Open the Fuse console and verify that the processing of event.
+![Stock Ticker console](images/03_logs.png)
+![Route stats](images/04_routestats.png)
+![Pipeline](images/05_pipeline.png)
+![Store orders](images/06_storeorders.png)
+![Historical data](images/07_gethistoricaldata.png)
+![Cache Historical](images/08_cachehistoricaldata.png)
+![Start Order](images/09_startorders.png)
+![Cache Order](images/10_cacheorders.png)
 
 1. Done!
  
