@@ -7,4 +7,33 @@
   </parent>
   <artifactId>stock-ticker-model</artifactId>
   <packaging>bundle</packaging>
+  <name>Stock Ticker Model</name>
+  
+  <dependencies>
+  	<dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-bindy</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+        <plugins>
+  			<plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <version>2.3.7</version>
+		        <configuration>
+		          <instructions>
+		            <Bundle-SymbolicName>stock-ticker-model</Bundle-SymbolicName>
+		            <Private-Package>org.jboss.demo.jdg.model.*</Private-Package>
+		            <Export-Package>org.jboss.demo.jdg.model.*,*</Export-Package>
+		          </instructions>
+		        </configuration>
+            </plugin>
+        </plugins>
+   </build>
 </project>

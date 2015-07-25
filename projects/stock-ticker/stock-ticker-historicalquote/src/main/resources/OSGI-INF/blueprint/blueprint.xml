@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+ 
+  <!-- Setup DataGrid in Fuse -->
+  <bean id="cacheManager" class="org.infinispan.manager.DefaultCacheManager"
+		init-method="start" destroy-method="stop">
+	<argument value="infinispan.xml" />
+  </bean>
+	
+  <service ref="cacheManager" interface="org.infinispan.manager.EmbeddedCacheManager" />
+
+  <bean id="bindyDataformat" class="org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat">
+  	<argument value="org.jboss.demo.jdg.model.StockHistoryQuote" />
+  </bean> 
+
+  <camelContext xmlns="http://camel.apache.org/schema/blueprint">
+  <endpoint uri="dozer:custorder?sourceModel=customer.Customer&amp;targetModel=org.jboss.demo.jdg.model.StockQuote&amp;unmarshalId=customer&amp;mappingFile=custorder.xml" id="custorder"/>
+  <dataFormats>
+    <jaxb contextPath="customer" id="customer"/>
+  </dataFormats>
+  <route id="pipeRoute">
+    <from uri="file:stockfolder?delete=true"/>
+    <log message="fileName = ${headers.CamelFileName}"/>
+    <pipeline>
+      <to uri="direct:storeOrderquote"/>
+      <setBody>
+        <xpath>/stockquote/symbol/text()</xpath>
+      </setBody>
+      <to uri="direct:getHistoricalData"/>
+      <to uri="direct:getAllOrders"/>
+    </pipeline>
+  </route>
+  
+  <route id="storeOrderRoute">
+    <from uri="direct:storeOrderquote"/>
+    <convertBodyTo type="java.lang.String"/>
+    <setHeader headerName="CamelInfinispanKey">
+      <simple>${headers.CamelFileName}</simple>
+    </setHeader>
+    <setHeader headerName="CamelInfinispanValue">
+      <simple>${body}</simple>
+    </setHeader>
+    <to uri="infinispan://locahost?cacheContainer=#cacheManager&amp;cacheName=stock-file-cache"/>
+  </route>
+  
+  <route id="historicalDataRoute">
+    <from uri="direct:getHistoricalData"/>
+    <recipientList delimiter="\n">
+      <simple>http4://ichart.yahoo.com/table.csv?s=${body}&amp;a=0&amp;b=1&amp;c=2013&amp;d=0&amp;e=31</simple>
+    </recipientList>
+    <unmarshal ref="bindyDataformat"/>
+    <split>
+      <simple>${body}</simple>
+      <log message="CSV content: ${body}"/>
+      <to uri="direct:storeHistoricalData"/>
+    </split>
+  </route>
+  
+  <route delayer="10" id="storeHistoricalDataRoute">
+    <from uri="direct:storeHistoricalData"/>
+    <setHeader headerName="CamelInfinispanKey">
+      <simple>${body.timeStampinLong}</simple>
+    </setHeader>
+    <setHeader headerName="CamelInfinispanValue">
+      <simple>${body}</simple>
+    </setHeader>
+    <to uri="infinispan://locahost?cacheContainer=#cacheManager&amp;cacheName=stock-ticker-cache"/>
+  </route>
+  <route id="getAllOrdersRoute">
+    <from uri="direct:getAllOrders"/>
+    <setHeader headerName="CamelInfinispanKey">
+      <simple>${headers.CamelFileName}</simple>
+    </setHeader>
+    <to uri="infinispan://locahost?cacheContainer=#cacheManager&amp;cacheName=stock-file-cache&amp;command=GET"/>
+    <setBody>
+      <simple>${header.CamelInfinispanOperationResult}</simple>
+    </setBody>
+    <split>
+      <tokenize token="customer" inheritNamespaceTagName="stockquote" xml="true"></tokenize>
+      <to uri="direct:pushorderRoute"/>
+    </split>
+  </route>
+  
+  <route delayer="500" id="pushorderRoute">
+    <from uri="direct:pushorderRoute"/>
+    <setBody>
+      <xpath>/customer</xpath>
+    </setBody>
+    <to ref="custorder"/>
+    <setHeader headerName="CamelInfinispanKey">
+      <simple>${body.custId}</simple>
+    </setHeader>
+    <setHeader headerName="CamelInfinispanValue">
+      <simple>${body}</simple>
+    </setHeader>
+    <to uri="infinispan://locahost?cacheContainer=#cacheManager&amp;cacheName=stock-order-cache"/>
+  </route>
+</camelContext>
+
+</blueprint>

@@ -1,0 +1,38 @@
+<stockquote>
+	<symbol>RHT</symbol>
+	<orders>
+		<customer custId="clin">
+			<shares>10305</shares>
+		</customer>
+		<customer custId="tqvarnst">
+			<shares>70543</shares>
+		</customer>
+		<customer custId="erics">
+			<shares>47002</shares>
+		</customer>
+		<customer custId="kpeeples">
+			<shares>20004</shares>
+		</customer>
+		<customer custId="sparulka">
+			<shares>408403</shares>
+		</customer>
+		<customer custId="mumeno">
+			<shares>6252</shares>
+		</customer>
+		<customer custId="kkomazaw">
+			<shares>8474</shares>
+		</customer>
+		<customer custId="mhu">
+			<shares>36531</shares>
+		</customer>
+		<customer custId="snliu">
+			<shares>67320</shares>
+		</customer>
+		<customer custId="jswart">
+			<shares>88725</shares>
+		</customer>
+		<customer custId="hpeng">
+			<shares>564534</shares>
+		</customer>
+	</orders>
+</stockquote>

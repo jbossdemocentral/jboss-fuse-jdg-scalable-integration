@@ -2,12 +2,12 @@
 basedir=`dirname $0`
 
 
-DEMO="JBoss Fuse and Data Grid Demo"
+DEMO="JBoss Fuse and Data Grid Stock Ticker Demo"
 AUTHORS="Thomas Qvarnstrom, Red Hat & Christina Lin, Red Hat"
 SRC_DIR=$basedir/installs
 
-FUSE_INSTALL=jboss-fuse-full-6.1.1.redhat-412.zip
-JDG_INSTALL=jboss-datagrid-6.4.0-server.zip
+FUSE_INSTALL=jboss-fuse-full-6.2.0.redhat-133.zip
+JDG_INSTALL=jboss-datagrid-6.5.0-server.zip
 
 SOFTWARE=($FUSE_INSTALL $JDG_INSTALL)
 
@@ -17,21 +17,20 @@ clear
 
 echo
 
-ASCII_WIDTH=52
-
+ASCII_WIDTH=57
 printf "##  %-${ASCII_WIDTH}s  ##\n" | sed -e 's/ /#/g'
-printf "##  %-${ASCII_WIDTH}s  ##\n"   
+printf "##  %-${ASCII_WIDTH}s  ##\n"
 printf "##  %-${ASCII_WIDTH}s  ##\n" "Setting up the ${DEMO}"
 printf "##  %-${ASCII_WIDTH}s  ##\n"
 printf "##  %-${ASCII_WIDTH}s  ##\n"
-printf "##  %-${ASCII_WIDTH}s  ##\n" "    # ####   ###   ###  ###   ###   ###"
-printf "##  %-${ASCII_WIDTH}s  ##\n" "    # #   # #   # #    #      #  # #"
-printf "##  %-${ASCII_WIDTH}s  ##\n" "    # ####  #   #  ##   ##    #  # #  ##"
-printf "##  %-${ASCII_WIDTH}s  ##\n" "#   # #   # #   #    #    #   #  # #   #"
-printf "##  %-${ASCII_WIDTH}s  ##\n" " ###  ####   ###  ###  ###    ###   ###"  
+printf "##  %-${ASCII_WIDTH}s  ##\n" "    # ###   ###        #### #  #  ### ####"
+printf "##  %-${ASCII_WIDTH}s  ##\n" "    # #  # #       #   #    #  # #    #"
+printf "##  %-${ASCII_WIDTH}s  ##\n" "    # #  # #  ##  ###  ###  #  # #### ####"
+printf "##  %-${ASCII_WIDTH}s  ##\n" "#   # #  # #   #   #   #    #  #    # #"
+printf "##  %-${ASCII_WIDTH}s  ##\n" " ###  ###   ###        #    #### ###  ####"  
 printf "##  %-${ASCII_WIDTH}s  ##\n"
 printf "##  %-${ASCII_WIDTH}s  ##\n"
-printf "##  %-${ASCII_WIDTH}s  ##\n"   
+printf "##  %-${ASCII_WIDTH}s  ##\n"
 printf "##  %-${ASCII_WIDTH}s  ##\n" "brought to you by,"
 printf "##  %-${ASCII_WIDTH}s  ##\n" "${AUTHORS}"
 printf "##  %-${ASCII_WIDTH}s  ##\n"

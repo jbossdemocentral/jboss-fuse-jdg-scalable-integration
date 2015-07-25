@@ -7,8 +7,6 @@ import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -18,6 +16,7 @@ import org.infinispan.Cache;
 import org.infinispan.commons.util.CloseableIteratorCollection;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.jboss.demo.jdg.model.StockHistoryQuote;
 import org.jboss.demo.jdg.model.StockQuote;
 
 public class StockPloter extends JPanel {
@@ -28,42 +27,59 @@ public class StockPloter extends JPanel {
 	public static final int WIDTH = 520;
 	public static final int HEIGHT = 400;
 	private static final int NUM_ELEMENTS = 500;
+	public static final int EXTRA_WIDTH_FOR_ORDERS = 200;
 	
 	private int maxStockValue = 500;
 	public  int pixelsPerPoint = Math.round(WIDTH-20/NUM_ELEMENTS);
-
+	private String orderlist = "";
 
 	
 	
 	public static final String cacheName = "stock-ticker-cache";
-	public static final String[] stockSymbols = {"ABC"};
+	public static final String cacheOrderName = "stock-order-cache";
+	public static final String[] stockSymbols = {"RHT"};
 	
-	private ArrayDeque<StockQuote> stockData = new ArrayDeque<StockQuote>(NUM_ELEMENTS);
+	private ArrayDeque<StockHistoryQuote> stockHistoryData = new ArrayDeque<StockHistoryQuote>(NUM_ELEMENTS);
+	private ArrayDeque<StockQuote> stockOrderData = new ArrayDeque<StockQuote>(NUM_ELEMENTS);
 	
-	Cache<String,StockQuote> cache;
+	Cache<String,StockHistoryQuote> cache;
 
 	public StockPloter() throws IOException {
 		super();
 		EmbeddedCacheManager cacheManager;
 		cacheManager = new DefaultCacheManager("infinispan.xml");
-		Cache<String,StockQuote> cache = cacheManager.getCache(cacheName);
+		Cache<String,StockHistoryQuote> cache = cacheManager.getCache(cacheName);
 		cache.addListener(new StockJDGReciever(this));
 		cache.start();
 		
-		CloseableIteratorCollection<StockQuote> values = cache.values();
+		Cache<String,StockQuote> orderCache = cacheManager.getCache(cacheOrderName);
+		orderCache.addListener(new OrderJDGReciever(this));
+		orderCache.start();
+		
+		CloseableIteratorCollection<StockHistoryQuote> values = cache.values();
 		System.out.format("The cache container has %d entries\n",values.size());
-		List<StockQuote> list = new ArrayList<StockQuote>(values);
-		Collections.sort( list , new Comparator< StockQuote >( ){
+		
+		CloseableIteratorCollection<StockQuote> orderShares = orderCache.values();
+		System.out.format("The order cache container has %d entries\n",orderShares.size());
+		
+		List<StockHistoryQuote> list = new ArrayList<StockHistoryQuote>(values);
+		List<StockQuote> orderlist = new ArrayList<StockQuote>(orderShares);
+		
+		/**Collections.sort( list , new Comparator< StockHistoryQuote >( ){
 			@Override
-			public int compare(StockQuote o1, StockQuote o2) {
+			public int compare(StockHistoryQuote o1, StockHistoryQuote o2) {
 				return o1.getId()-o2.getId();
 			}
-		} );
+		} ); **/
 		
-		for(StockQuote quote : (list.size()<NUM_ELEMENTS) ? list : (list.subList(list.size()-NUM_ELEMENTS, list.size()))) {
-			if(quote.getValue()>maxStockValue)
-				maxStockValue=quote.getValue();
-			this.stockData.add(quote);
+		for(StockHistoryQuote quote : (list.size()<NUM_ELEMENTS) ? list : (list.subList(list.size()-NUM_ELEMENTS, list.size()))) {
+			if(quote.getVolume()>maxStockValue)
+				maxStockValue=quote.getVolume();
+			this.stockHistoryData.add(quote);
+		}
+		
+		for(StockQuote orderQuote : (list.size()<NUM_ELEMENTS) ? orderlist : (orderlist.subList(orderlist.size()-NUM_ELEMENTS, orderlist.size()))) {
+			this.stockOrderData.add(orderQuote);
 		}
 		this.repaint();
 		
@@ -79,18 +95,32 @@ public class StockPloter extends JPanel {
 		
 		int oldValue=-1;
 		
-		if (stockData!=null && stockData.size()>0) {
+		if (stockHistoryData!=null && stockHistoryData.size()>0) {
 			int x=0;
-			for (StockQuote quote : stockData) {
+			for (StockHistoryQuote quote : stockHistoryData) {
 				if (oldValue > 0) {
-					int newValue = quote.getValue();
+					int newValue = quote.getVolume();
 					g2.drawLine(x, scaleAndPositionValue(oldValue), x+=pixelsPerPoint, scaleAndPositionValue(newValue));
 				}
-				oldValue = quote.getValue();
+				oldValue = quote.getVolume();
 			}
 			 
-			int currentValue = stockData.getLast().getValue();
-			String currentValueStr = String.format("CurrentValue: %d", currentValue);
+			int currentValue = stockHistoryData.getLast().getVolume();
+			String currentValueStr = String.format("CurrentValue: %d \n", currentValue);
+			
+			
+			//Print out ordered shares, if any
+			int orderheight = 10;
+			for (StockQuote order : stockOrderData) {
+				orderlist = String.format("%s buys %d shares \n", order.getCustId() ,order.getVolume() );
+				if(orderlist != null && !"".equals(orderlist.trim())){
+					g.drawChars(orderlist.toCharArray(), 0, orderlist.length(), getWidth()-EXTRA_WIDTH_FOR_ORDERS + 10, 50+orderheight);
+					orderheight += 10;
+				}
+			}
+			
+			
+			
 			g.drawChars(currentValueStr.toCharArray(), 0, currentValueStr.length(), getWidth()/2-50, getHeight()-10);
 		}
 	}
@@ -106,16 +136,25 @@ public class StockPloter extends JPanel {
 		return positionedScaledValue;
 	}
 	
-	public void add(StockQuote quote) {
-		this.stockData.add(quote);
-		if(stockData.size()>NUM_ELEMENTS) {
-			stockData.removeFirst(); //We will only save enough data to print on the screen
+	public void add(StockHistoryQuote quote) {
+		this.stockHistoryData.add(quote);
+		if(stockHistoryData.size()>NUM_ELEMENTS) {
+			stockHistoryData.removeFirst(); //We will only save enough data to print on the screen
 		}
-		if(quote.getValue()>maxStockValue)
-			maxStockValue=quote.getValue();
+		if(quote.getVolume()>maxStockValue)
+			maxStockValue=quote.getVolume();
 		this.repaint();
 	}
 
+	public void addOrder(StockQuote order) {
+		this.stockOrderData.add(order);
+		if(stockOrderData.size()>NUM_ELEMENTS) {
+			stockOrderData.removeFirst(); //We will only save enough data to print on the screen
+		}
+		
+		this.repaint();
+	}
+	
 	public static void main(String[] args) throws IOException {
 		//String symbol = JOptionPane.showInputDialog("Enter Ticker Symbol:");
 		String symbol = stockSymbols[0];
@@ -130,7 +169,7 @@ public class StockPloter extends JPanel {
 		panel.setBackground(Color.WHITE);
 		frame.setBackground(Color.WHITE);
 		frame.add(panel);
-		frame.setSize(WIDTH, HEIGHT); 
+		frame.setSize(WIDTH+EXTRA_WIDTH_FOR_ORDERS, HEIGHT); 
 		frame.setVisible(true);
 		
 	}

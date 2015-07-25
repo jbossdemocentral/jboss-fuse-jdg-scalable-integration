@@ -11,13 +11,12 @@
 		<dependency>
 			<groupId>org.infinispan</groupId>
 			<artifactId>infinispan-embedded</artifactId>
-			<version>6.2.1.Final-redhat-2</version>
+			<version>6.3.0.Final-redhat-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.demo.jdg</groupId>
 			<artifactId>stock-ticker-model</artifactId>
 			<version>1.0.0</version>
-			<type>bundle</type>
 		</dependency>
 	</dependencies>
 	<build>

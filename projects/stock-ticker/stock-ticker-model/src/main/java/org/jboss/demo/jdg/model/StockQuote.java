@@ -5,31 +5,29 @@ import java.io.Serializable;
 public class StockQuote implements Serializable{
 	private static final long serialVersionUID = 8651457763762868219L;
 	
-	private int id;
-	private String symbol;
-	private int value;
+	private String custId;
+	private int volume;
 	
-	public int getId() {
-		return id;
+	public String getCustId() {
+		return custId;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setCustId(String custId) {
+		this.custId = custId;
 	}
-	public String getSymbol() {
-		return symbol;
+	
+	public int getVolume() {
+		return volume;
 	}
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
+	public void setVolume(int volume) {
+		this.volume = volume;
 	}
-	public int getValue() {
-		return value;
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
-	public void setValue(int value) {
-		this.value = value;
-	}
+	
 	@Override
 	public String toString() {
-		return String.format("%d: %s=%d", this.id, this.symbol, this.value);
+		return String.format("%s=%s", this.custId,this.volume);
 	}
 	
 	
