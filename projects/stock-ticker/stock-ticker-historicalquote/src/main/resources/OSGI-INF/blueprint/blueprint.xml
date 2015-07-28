@@ -10,7 +10,7 @@
 		init-method="start" destroy-method="stop">
 	<argument value="infinispan.xml" />
   </bean>
-	
+
   <service ref="cacheManager" interface="org.infinispan.manager.EmbeddedCacheManager" />
 
   <bean id="bindyDataformat" class="org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat">
@@ -34,7 +34,6 @@
       <to uri="direct:getAllOrders"/>
     </pipeline>
   </route>
-  
   <route id="storeOrderRoute">
     <from uri="direct:storeOrderquote"/>
     <convertBodyTo type="java.lang.String"/>
@@ -46,7 +45,6 @@
     </setHeader>
     <to uri="infinispan://locahost?cacheContainer=#cacheManager&amp;cacheName=stock-file-cache"/>
   </route>
-  
   <route id="historicalDataRoute">
     <from uri="direct:getHistoricalData"/>
     <recipientList delimiter="\n">
@@ -59,7 +57,6 @@
       <to uri="direct:storeHistoricalData"/>
     </split>
   </route>
-  
   <route delayer="10" id="storeHistoricalDataRoute">
     <from uri="direct:storeHistoricalData"/>
     <setHeader headerName="CamelInfinispanKey">
@@ -84,13 +81,23 @@
       <to uri="direct:pushorderRoute"/>
     </split>
   </route>
-  
   <route delayer="500" id="pushorderRoute">
     <from uri="direct:pushorderRoute"/>
     <setBody>
       <xpath>/customer</xpath>
     </setBody>
     <to ref="custorder"/>
+    <setHeader headerName="CamelInfinispanKey">
+      <simple>${body.timeStampinLong}</simple>
+    </setHeader>
+    <to uri="infinispan://locahost?cacheContainer=#cacheManager&amp;cacheName=stock-ticker-cache&amp;command=GET"/>
+    <setBody>
+      <groovy>
+      	request.body.closeValue=request.headers.CamelInfinispanOperationResult.adjClose
+      	return request.body
+      </groovy>
+    </setBody>
+    <log message="ID:[${body.custId}] shares:[${body.volume}] value:[${body.closeValue}] " />
     <setHeader headerName="CamelInfinispanKey">
       <simple>${body.custId}</simple>
     </setHeader>

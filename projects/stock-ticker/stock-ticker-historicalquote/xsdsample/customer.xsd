@@ -3,7 +3,8 @@
   <xs:element name="customer">
     <xs:complexType>
       <xs:sequence>
-        <xs:element type="xs:int" name="shares"/>
+        <xs:element type="xs:date" name="buydate"/>
+        <xs:element type="xs:short" name="shares"/>
       </xs:sequence>
       <xs:attribute type="xs:string" name="custId"/>
     </xs:complexType>

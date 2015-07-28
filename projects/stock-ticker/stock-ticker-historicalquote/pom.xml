@@ -16,7 +16,7 @@
     <fabric8.parentProfiles>feature-camel</fabric8.parentProfiles>
     <fabric8.bundles>mvn:org.jboss.demo.jdg/stock-ticker-model/1.0.0</fabric8.bundles>
 	<fabric8.profile>demo-jdg-stockticker</fabric8.profile>
-	<fabric8.features>camel-dozer camel-jaxb camel-bindy camel-http4 camel-jbossdatagrid</fabric8.features>
+	<fabric8.features>camel-dozer camel-jaxb camel-bindy camel-http4 camel-groovy camel-jbossdatagrid</fabric8.features>
 	<fabric8.featureRepos>mvn:org.apache.camel/camel-jbossdatagrid/6.5.0.Final-redhat-5/xml/features</fabric8.featureRepos> 
   </properties>
   <dependencies>
@@ -61,6 +61,10 @@
 	    <groupId>org.apache.camel</groupId>
 	    <artifactId>camel-http4</artifactId>
 	</dependency>
+    <dependency>
+	    <groupId>org.apache.camel</groupId>
+	    <artifactId>camel-groovy</artifactId>
+	</dependency>	
     <dependency>
 		<groupId>org.apache.camel</groupId>
 		<artifactId>camel-jbossdatagrid</artifactId>

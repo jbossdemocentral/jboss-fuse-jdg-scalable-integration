@@ -7,6 +7,10 @@
         <class-a>customer.Customer</class-a>
         <class-b>org.jboss.demo.jdg.model.StockQuote</class-b>
         <field>
+            <a>buydate</a>
+            <b>buydate</b>
+        </field>
+        <field>
             <a>custId</a>
             <b>custId</b>
         </field>

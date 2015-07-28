@@ -38,7 +38,7 @@
         <clustering mode="replication">
             <async/>
         </clustering>
-        <eviction maxEntries="500" strategy="FIFO"/>
+        <eviction maxEntries="1500" strategy="FIFO"/>
 	</namedCache>
 	<namedCache name="stock-order-cache">
     	<jmxStatistics enabled="true"/>

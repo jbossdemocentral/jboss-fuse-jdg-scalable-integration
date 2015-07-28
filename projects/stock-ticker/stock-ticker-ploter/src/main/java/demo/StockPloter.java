@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +28,9 @@ public class StockPloter extends JPanel {
 	public static final int WIDTH = 520;
 	public static final int HEIGHT = 400;
 	private static final int NUM_ELEMENTS = 500;
-	public static final int EXTRA_WIDTH_FOR_ORDERS = 200;
+	public static final int EXTRA_WIDTH_FOR_ORDERS = 250;
 	
-	private int maxStockValue = 500;
+	private double maxStockValue = 70;
 	public  int pixelsPerPoint = Math.round(WIDTH-20/NUM_ELEMENTS);
 	private String orderlist = "";
 
@@ -73,12 +74,12 @@ public class StockPloter extends JPanel {
 		} ); **/
 		
 		for(StockHistoryQuote quote : (list.size()<NUM_ELEMENTS) ? list : (list.subList(list.size()-NUM_ELEMENTS, list.size()))) {
-			if(quote.getVolume()>maxStockValue)
-				maxStockValue=quote.getVolume();
+			if(quote.getAdjClose()>maxStockValue)
+				maxStockValue=quote.getAdjClose();
 			this.stockHistoryData.add(quote);
 		}
 		
-		for(StockQuote orderQuote : (list.size()<NUM_ELEMENTS) ? orderlist : (orderlist.subList(orderlist.size()-NUM_ELEMENTS, orderlist.size()))) {
+		for(StockQuote orderQuote : (orderlist.size()<NUM_ELEMENTS) ? orderlist : (orderlist.subList(orderlist.size()-NUM_ELEMENTS, orderlist.size()))) {
 			this.stockOrderData.add(orderQuote);
 		}
 		this.repaint();
@@ -93,40 +94,42 @@ public class StockPloter extends JPanel {
 		
 		pixelsPerPoint = getWidth()/NUM_ELEMENTS;
 		
-		int oldValue=-1;
+		double oldValue=-1.0;
 		
 		if (stockHistoryData!=null && stockHistoryData.size()>0) {
 			int x=0;
 			for (StockHistoryQuote quote : stockHistoryData) {
 				if (oldValue > 0) {
-					int newValue = quote.getVolume();
+					double newValue = quote.getAdjClose();
 					g2.drawLine(x, scaleAndPositionValue(oldValue), x+=pixelsPerPoint, scaleAndPositionValue(newValue));
 				}
-				oldValue = quote.getVolume();
+				oldValue = quote.getAdjClose();
 			}
 			 
-			int currentValue = stockHistoryData.getLast().getVolume();
-			String currentValueStr = String.format("CurrentValue: %d \n", currentValue);
-			
-			
+			double currentValue = stockHistoryData.getLast().getAdjClose();
+			String currentValueStr = String.format("CurrentValue: %g \n", currentValue);	
+			g.drawChars(currentValueStr.toCharArray(), 0, currentValueStr.length(), getWidth()/2-50, getHeight()-10);
+		}
+		if (stockOrderData!=null && stockOrderData.size()>0) {
 			//Print out ordered shares, if any
 			int orderheight = 10;
+			double earnvalue = 0.0;
 			for (StockQuote order : stockOrderData) {
-				orderlist = String.format("%s buys %d shares \n", order.getCustId() ,order.getVolume() );
+				earnvalue =(order.getVolume() * stockHistoryData.getFirst().getAdjClose()) - (order.getVolume()* order.getCloseValue());
+				orderlist = String.format("[%s] bought %d shares at value", order.getCustId() ,order.getVolume());
+				String earnlist = String.format(" $%s, and earns $%s today ", roundDouble(order.getCloseValue()), roundDouble(earnvalue));
 				if(orderlist != null && !"".equals(orderlist.trim())){
 					g.drawChars(orderlist.toCharArray(), 0, orderlist.length(), getWidth()-EXTRA_WIDTH_FOR_ORDERS + 10, 50+orderheight);
 					orderheight += 10;
+					g.drawChars(earnlist.toCharArray(), 0, earnlist.length(), getWidth()-EXTRA_WIDTH_FOR_ORDERS + 10, 50+orderheight);
+					orderheight += 15;
 				}
 			}
-			
-			
-			
-			g.drawChars(currentValueStr.toCharArray(), 0, currentValueStr.length(), getWidth()/2-50, getHeight()-10);
 		}
 	}
 	
 	
-	private int scaleAndPositionValue(int value) {
+	private int scaleAndPositionValue(double value) {
 		double heightInDrawArea = this.getHeight()*RELATIV_SCREEN_AREA;
 		double pixelsPerValuePoint = heightInDrawArea/maxStockValue;
 		int middleOfPanel=(int) Math.round(this.getHeight()/2);
@@ -141,8 +144,8 @@ public class StockPloter extends JPanel {
 		if(stockHistoryData.size()>NUM_ELEMENTS) {
 			stockHistoryData.removeFirst(); //We will only save enough data to print on the screen
 		}
-		if(quote.getVolume()>maxStockValue)
-			maxStockValue=quote.getVolume();
+		if(quote.getAdjClose()>maxStockValue)
+			maxStockValue=quote.getAdjClose();
 		this.repaint();
 	}
 
@@ -153,6 +156,12 @@ public class StockPloter extends JPanel {
 		}
 		
 		this.repaint();
+	}
+	
+	private String roundDouble(double val){
+		DecimalFormat df2 = new DecimalFormat("#########.##");
+		
+        return df2.format(val);
 	}
 	
 	public static void main(String[] args) throws IOException {

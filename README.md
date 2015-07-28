@@ -16,7 +16,7 @@ After that run the `init.sh` script
 
 Demo storty
 -----------
-A stock market broker needs to provide it's brokers with historical data of past stock volume (amount of shares that trade hands from sellers to buyers). And also needs to list all today's buyer's shares in the console after displaying the past volume. The broker decides to send order information to trigger stock tick event, the information are send to JBoss Fuse. It implements a integration flow to request for historical data from external SAAS, then pass the data to stock ticker console, and then process the order by parsing the XML to Java POJO for display and further process. 
+A stock market broker needs to provide it's brokers with historical data of past stock close value (amount of shares that trade hands from sellers to buyers). And also needs to list all today's buyer's shares and how much they will earn if they sell their shares today after showing the past value graph. The broker decides to send order information to trigger stock tick event, the information are send to JBoss Fuse. It implements a integration flow to request for historical data from external SAAS, then pass the data to stock ticker console, and then process the order by parsing the XML to Java POJO for display and further process. 
 
 The problem
 -----------
