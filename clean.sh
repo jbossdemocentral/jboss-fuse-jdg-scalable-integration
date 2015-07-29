@@ -56,6 +56,27 @@ echo
 
 
 # If target directory exists remove it
+if [ -x projects/stock-ticker/stock-ticker-historicalquote/target ]; then
+		echo "  - deleting existing historicalquote project target directory..."
+		echo
+		rm -rf projects/stock-ticker/stock-ticker-historicalquote/target
+fi
+
+# If target directory exists remove it
+if [ -x projects/stock-ticker/stock-ticker-model/target ]; then
+		echo "  - deleting existing historicalquote project target directory..."
+		echo
+		rm -rf projects/stock-ticker/stock-ticker-model/target
+fi
+
+# If target directory exists remove it
+if [ -x projects/stock-ticker/stock-ticker-ploter/target ]; then
+		echo "  - deleting existing ploter project target directory..."
+		echo
+		rm -rf projects/stock-ticker/stock-ticker-ploter/target
+fi
+
+# If target directory exists remove it
 if [ -x target ]; then
 		echo "  - deleting existing target directory..."
 		echo
