@@ -2,37 +2,48 @@
 	<symbol>RHT</symbol>
 	<orders>
 		<customer custId="clin">
-			<shares>10305</shares>
+			<buydate>2014-06-19</buydate>
+			<shares>305</shares>
 		</customer>
 		<customer custId="tqvarnst">
-			<shares>70543</shares>
+			<buydate>2014-06-02</buydate>
+			<shares>543</shares>
 		</customer>
 		<customer custId="erics">
-			<shares>47002</shares>
+			<buydate>2013-03-18</buydate>
+			<shares>902</shares>
 		</customer>
 		<customer custId="kpeeples">
-			<shares>20004</shares>
+			<buydate>2014-05-23</buydate>
+			<shares>1164</shares>
 		</customer>
 		<customer custId="sparulka">
-			<shares>408403</shares>
+			<buydate>2013-08-14</buydate>
+			<shares>483</shares>
 		</customer>
 		<customer custId="mumeno">
-			<shares>6252</shares>
+			<buydate>2013-11-18</buydate>
+			<shares>252</shares>
 		</customer>
 		<customer custId="kkomazaw">
-			<shares>8474</shares>
+			<buydate>2013-01-02</buydate>
+			<shares>474</shares>
 		</customer>
 		<customer custId="mhu">
-			<shares>36531</shares>
+			<buydate>2013-12-09</buydate>
+			<shares>531</shares>
 		</customer>
 		<customer custId="snliu">
-			<shares>67320</shares>
+			<buydate>2015-03-12</buydate>
+			<shares>320</shares>
 		</customer>
 		<customer custId="jswart">
-			<shares>88725</shares>
+			<buydate>2014-03-24</buydate>
+			<shares>725</shares>
 		</customer>
 		<customer custId="hpeng">
-			<shares>564534</shares>
+			<buydate>2014-02-14</buydate>
+			<shares>534</shares>
 		</customer>
 	</orders>
 </stockquote>

@@ -199,8 +199,13 @@ done
 #===================================================================
 
 
-cd $FUSE_PROJECT/stock-ticker-historicalquote
+echo "  - install stock ticker model "
+echo
 
+cd $FUSE_PROJECT/stock-ticker-model
+mvn clean install
+
+cd ../stock-ticker-historicalquote
 
 echo "  - deploy stock ticker historical order integration to fabric"
 echo
