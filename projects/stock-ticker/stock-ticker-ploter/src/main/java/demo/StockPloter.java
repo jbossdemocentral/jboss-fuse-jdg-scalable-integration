@@ -1,5 +1,6 @@
 package demo;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -21,6 +22,8 @@ import org.jboss.demo.jdg.model.StockHistoryQuote;
 import org.jboss.demo.jdg.model.StockQuote;
 
 public class StockPloter extends JPanel {
+
+	private static final float LINE_THICKNESS = 1.2f;
 
 	private static final long serialVersionUID = -6701507664970285335L;
 
@@ -101,6 +104,7 @@ public class StockPloter extends JPanel {
 			for (StockHistoryQuote quote : stockHistoryData) {
 				if (oldValue > 0) {
 					double newValue = quote.getAdjClose();
+					g2.setStroke(new BasicStroke(LINE_THICKNESS));
 					g2.drawLine(x, scaleAndPositionValue(oldValue), x+=pixelsPerPoint, scaleAndPositionValue(newValue));
 				}
 				oldValue = quote.getAdjClose();
@@ -167,11 +171,6 @@ public class StockPloter extends JPanel {
 	public static void main(String[] args) throws IOException {
 		//String symbol = JOptionPane.showInputDialog("Enter Ticker Symbol:");
 		String symbol = stockSymbols[0];
-		if (symbol == null)
-			System.exit(0); // quit if user hit Cancel
-		
-		
-
 		StockPloter panel = new StockPloter();	
 		JFrame frame = new JFrame(String.format("Data for stock %s", symbol));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
