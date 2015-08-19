@@ -8,7 +8,7 @@ SRC_DIR=$basedir/installs
 
 #JDG_INSTALL=jboss-datagrid-6.4.1-server.zip
 
-#Fuse env 
+#Fuse env
 DEMO_HOME=./target
 SUPPORT_DIR=./support
 FUSE_ZIP=jboss-fuse-full-6.2.0.redhat-133.zip
@@ -36,7 +36,7 @@ printf "##  %-${ASCII_WIDTH}s  ##\n" "    # ###   ###        #### #  #  ### ####
 printf "##  %-${ASCII_WIDTH}s  ##\n" "    # #  # #       #   #    #  # #    #"
 printf "##  %-${ASCII_WIDTH}s  ##\n" "    # #  # #  ##  ###  ###  #  # #### ####"
 printf "##  %-${ASCII_WIDTH}s  ##\n" "#   # #  # #   #   #   #    #  #    # #"
-printf "##  %-${ASCII_WIDTH}s  ##\n" " ###  ###   ###        #    #### ###  ####"  
+printf "##  %-${ASCII_WIDTH}s  ##\n" " ###  ###   ###        #    #### ###  ####"
 printf "##  %-${ASCII_WIDTH}s  ##\n"
 printf "##  %-${ASCII_WIDTH}s  ##\n"
 printf "##  %-${ASCII_WIDTH}s  ##\n"
@@ -56,11 +56,11 @@ echo
 mvn -v -q >/dev/null 2>&1 || { echo >&2 "Maven is required but not installed yet... aborting."; exit 1; }
 
 
-# Check mvn version must be in 3.1.1 to 3.2.4	
+# Check mvn version must be in 3.1.1 to 3.2.4
 verone=$(mvn -version | awk '/Apache Maven/{print $3}' | awk -F[=.] '{print $1}')
 vertwo=$(mvn -version | awk '/Apache Maven/{print $3}' | awk -F[=.] '{print $2}')
-verthree=$(mvn -version | awk '/Apache Maven/{print $3}' | awk -F[=.] '{print $3}')     
-     
+verthree=$(mvn -version | awk '/Apache Maven/{print $3}' | awk -F[=.] '{print $3}')
+
 if [[ $verone -eq 3 ]] && [[ $vertwo -eq 1 ]] && [[ $verthree -ge 1 ]]; then
 		echo  Correct Maven version $verone.$vertwo.$verthree
 		echo
@@ -71,7 +71,7 @@ else
 		echo Please make sure you have Maven 3.1.1 - 3.2.4 installed in order to use fabric maven plugin.
 		echo
 		echo We are unable to run with current installed maven version: $verone.$vertwo.$verthree
-		echo	
+		echo
 		exit
 fi
 
@@ -120,13 +120,13 @@ echo
 if [ -x target ]; then
   # Unzip the JBoss FUSE instance.
 	echo
-  echo Installing JBoss FUSE 
+  echo Installing JBoss FUSE
   echo
   unzip -q -d target $SRC_DIR/$FUSE_ZIP
 else
 	echo
 	echo Missing target directory, stopping installation.
-	echo 
+	echo
 	exit
 fi
 
@@ -153,7 +153,7 @@ echo "  - adding DataGrid repo to io.fabric8.agent.properties file..."
 echo
 cp $SUPPORT_DIR/fuse/io.fabric8.agent.properties $FUSE_HOME/fabric/import/fabric/profiles/default.profile/
 
- 
+
 
 
 #echo "  - installing datagrid"
@@ -176,25 +176,27 @@ echo "  - Start up Fuse in the background"
 echo
 sh $FUSE_SERVER_BIN/start
 
+sleep 10
+
 echo "  - Create Fabric in Fuse"
 echo
-sh $FUSE_SERVER_BIN/client -r 3 -d 10 -u admin -p admin 'fabric:create' > /dev/null
+sh $FUSE_SERVER_BIN/client -r 10 -d 10 -u admin -p admin 'fabric:create' > /dev/null
 
 
-COUNTER=10
+COUNTER=20
 #===Test if the fabric is ready=====================================
 echo "  - Testing fabric,retry when not ready"
 while true; do
-    if [ $(sh $FUSE_SERVER_BIN/client 'fabric:status'| grep "100%" | wc -l ) -ge 3 ]; then
-        break
-    fi
-    
-    if [  $COUNTER -le 0 ]; then
-    	echo ERROR, while creating Fabric, please check your Network settings.
-    	break
-    fi
-    let COUNTER=COUNTER-1
-    sleep 2
+   if [ $(sh $FUSE_SERVER_BIN/client 'fabric:status'| grep "100%" | wc -l ) -ge 3 ]; then
+       break
+   fi
+
+   if [  $COUNTER -le 0 ]; then
+   	echo ERROR, while creating Fabric, please check your Network settings.
+   	exit
+   fi
+   let COUNTER=COUNTER-1
+   sleep 4
 done
 #===================================================================
 
@@ -223,7 +225,7 @@ mvn assembly:single
 cd ../../..
 
 echo "  - Create containers "
-echo         
+echo
 sh $FUSE_SERVER_BIN/client -r 2 -d 5 'container-create-child root tickercon'
 
 
@@ -234,19 +236,19 @@ sh $FUSE_SERVER_BIN/client -r 2 -d 5 'container-create-child root tickercon'
 
 ASCII_WIDTH=105
 
-printf "=  %-${ASCII_WIDTH}s  =\n" | sed -e 's/ /#/g'
+printf "=  %-${ASCII_WIDTH}s  =\n" | sed -e 's/ /=/g'
 printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" " Starting the camel route in JBoss Fuse as follows:"
 printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" "    - login to Fuse management console at:"
-printf "=  %-${ASCII_WIDTH}s  =\n" 
+printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" "        http://localhost:8181    (u:admin/p:admin)"
 printf "=  %-${ASCII_WIDTH}s  =\n"
-printf "=  %-${ASCII_WIDTH}s  =\n" "    - go to Services Tab, under container, find containt tickercon"  
+printf "=  %-${ASCII_WIDTH}s  =\n" "    - go to Services Tab, under container, find containt tickercon"
 printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" "        add profile demo-jdg-stockticker to tickercon container"
-printf "=  %-${ASCII_WIDTH}s  =\n" 
+printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" "    - start up ploter, go to /support folder "
 printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" "        run ./start-client.sh"
@@ -258,5 +260,4 @@ printf "=  %-${ASCII_WIDTH}s  =\n"
 printf "=  %-${ASCII_WIDTH}s  =\n" "    - once you are done, to stop and clean everything run"
 printf "=  %-${ASCII_WIDTH}s  =\n" "        ./clean.sh"
 printf "=  %-${ASCII_WIDTH}s  =\n"
-printf "=  %-${ASCII_WIDTH}s  =\n" | sed -e 's/ /#/g'
-
+printf "=  %-${ASCII_WIDTH}s  =\n" | sed -e 's/ /=/g'
