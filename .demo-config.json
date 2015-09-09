@@ -1,0 +1,19 @@
+{
+  "name":"Scalable Integration with JBoss Fuse and JBoss Data Grid",
+  "summary":"This demos shows how to use JBoss Data Grid for Claim check patterns as well as producer and consumer in JBoss Fuse",
+  "author":"Thomas Qvarnstrom, Christina Lin",
+  "category":"jdg",
+  "categories":["jdg","multi","fuse"],
+  "level":"Intermediate",
+  "published":true,
+  "prerequisites":"Java 1.7, Maven",
+  "targetProduct":"JBoss Data Grid and JBoss Fuse",
+  "productVersion":"JBoss DG 6.4 and JBoss Fuse 6.2",
+  "technologies": ["Camel","Camel Infinispan Connector","JBoss DG","JBoss Fuse"],
+  "links": [ 
+    {
+      "name":"Code",
+      "url":"https://github.com/jbossdemocentral/dv-fuse-integration-demo"
+    }
+  ]
+}
